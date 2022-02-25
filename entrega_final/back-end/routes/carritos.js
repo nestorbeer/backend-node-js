@@ -1,50 +1,53 @@
 const express = require('express');
 const carritos = express.Router()
 
-let products = [{
-    "id":1, "timestamp": "", "descripcion":"Campera","precio":100,"stock":10,"foto":"http://lalala1"
-},
-{
-    "id":2, "timestamp": "", "descripcion":"Remera","precio":150,"stock":20,"foto":"http://lalala1"
-}
-]
+const Carritos = require('../containers/CartContainer')
+const Carts = new Carritos('./public/carritos.json')
 
-/*Carrito*/
-carritos.get('/api/carrito/:id', (request, response)=>{
-    const id = request.params.id
-    const cart = [...carritos].filter(element => element.id == id)
-    if(product.length > 0){
-        response.json(carrito.productos)
-    }
-    else{
-        response.send({error:'Producto no encontrado'})
-    }
+carritos.post('/', async (req, res) => {
+    const cart = req.body
+    res.json(await Carts.save(cart))
 })
 
-carritos.post('/api/carrito', (request, response, next)=>{
-    const cartIndex = carritos.length
-
-    carritos.push({id:cartIndex, productos:[]})
-    response.send({id:cartIndex})
-})
-
-carritos.post('/api/carrito:id_prod', (request, response, next)=>{
-    const cartIndex = carritos.length
-    const id_prod = parseInt(req.params.id_prod)
-    const productToAdd = [...products.filter(element => element.id == id_prod)][0]
-    carritos.filter(product => product.id != id)[0].productos.push(productToAdd)
-    response.send({id:cartIndex})
-})
-
-carritos.delete('/api/carrito/:id_cart', (request, response)=>{
+carritos.delete('/:id', async (req, res) => {
     const id = parseInt(req.params.id)
-    carritos.filter(product => product.id != id)[0].productos = []
-    response.send({result:'ok'})
+    res.json(await Carts.deleteById(id))
 })
 
-carritos.delete('/api/carrito/:id_prod', (request, response)=>{
-    const id_prod = parseInt(req.params.id_prod)
-    carritos.productos = carritos.productos.filter(product => product.id != id)
-    response.send({result:'ok'})
+carritos.get('/:id/productos', async (req, res) => {
+    const id = parseInt(req.params.id)
+    res.json(await Carts.getById(id).productos)
 })
+
+carritos.post('/:id/productos', async (req, res) => {
+    const id = parseInt(req.params.id)
+    const prodcart = req.body
+    res.json(await Carts.saveProductoById(id, prodcart))
+})
+
+carritos.put('/:id', async (req, res) => {
+    const id = parseInt(req.params.id)
+    const cart = req.body
+    res.json(await Carts.update(id, cart))
+})
+
+carritos.get('/:id/productos/:id_prod', async (req, res) => {
+    const id = parseInt(req.params.id)
+    const id_prod = parseInt(req.params.id_prod)
+
+    res.json(await Carts.getProductoById(id, id_prod))
+})
+
+carritos.delete('/:id/productos/:id_prod', async (req, res) => {
+    const id = parseInt(req.params.id)
+    const id_prod = parseInt(req.params.id_prod)
+
+    res.json(await Carts.deleteProductoById(id, id_prod))
+})
+
+carritos.get('/:id', async (req, res) => {
+    const id = parseInt(req.params.id)
+    res.json(await Carts.getById(id))
+})
+
 module.exports = carritos
