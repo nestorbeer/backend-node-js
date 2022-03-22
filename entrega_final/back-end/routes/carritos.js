@@ -1,19 +1,19 @@
 import { Router } from "express";
-import cartsDao from "../daos/carts/carts.daos.js";
-import productsDao from "../daos/products/products.daos.js";
+import cartsDao from "../daos/cartDao.js";
+import productsDao from "../daos/productDao.js";
 
-export const cartRouter = Router();
+export const route_carritos = Router();
 
 const cartsContainer = cartsDao;
 const productsContainer = productsDao;
 
 // Endpoints Cart
 
-cartRouter.get("/", async (req, res) => {
+route_carritos.get("/", async (req, res) => {
 	res.json(await cartsContainer.getAll());
 });
 
-cartRouter.get("/:id", async (req, res) => {
+route_carritos.get("/:id", async (req, res) => {
 	const cartId = req.params.id;
 	const cart = await cartsContainer.getById(cartId);
 
@@ -24,7 +24,7 @@ cartRouter.get("/:id", async (req, res) => {
 	}
 });
 
-cartRouter.get("/:id/productos", async (req, res) => {
+route_carritos.get("/:id/productos", async (req, res) => {
 	const cartId = req.params.id;
 	const cart = await cartsContainer.getById(cartId);
 
@@ -35,11 +35,11 @@ cartRouter.get("/:id/productos", async (req, res) => {
 	}
 });
 
-cartRouter.post("/", async (req, res) => {
+route_carritos.post("/", async (req, res) => {
 	res.json(await cartsContainer.save(req.body));
 });
 
-cartRouter.post("/:id/productos", async (req, res) => {
+route_carritos.post("/:id/productos", async (req, res) => {
 	const cart = await cartsContainer.getById(req.params.id);
 	const product = await productsContainer.getById(req.body.id);
 	cart.productos.push(product);
@@ -47,16 +47,16 @@ cartRouter.post("/:id/productos", async (req, res) => {
 	res.json(await cartsContainer.updateById(req.params.id, cart));
 });
 
-cartRouter.delete("/", async (req, res) => {
+route_carritos.delete("/", async (req, res) => {
 	res.send(await cartsContainer.deleteAll());
 });
 
-cartRouter.delete("/:id", async (req, res) => {
+route_carritos.delete("/:id", async (req, res) => {
 	const cartId = req.params.id;
 	res.send(await cartsContainer.deleteById(cartId));
 });
 
-cartRouter.delete("/:id/productos/:id_prod", async (req, res) => {
+route_carritos.delete("/:id/productos/:id_prod", async (req, res) => {
 	const cartId = req.params.id;
 	const productId = req.params.id_prod;
 	try {

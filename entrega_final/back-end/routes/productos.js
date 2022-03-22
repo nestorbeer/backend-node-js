@@ -1,7 +1,7 @@
 import { Router } from "express";
-import productsDao from "../daos/products/products.daos.js";
+import productsDao from "../daos/productDao.js";
 
-export const productsRouter = Router();
+export const route_productos = Router();
 
 const productsContainer = productsDao;
 
@@ -13,11 +13,11 @@ const authError = (req) => ({
 });
 
 // Endpoints products
-productsRouter.get("/", async (req, res) => {
+route_productos.get("/", async (req, res) => {
 	res.json(await productsContainer.getAll());
 });
 
-productsRouter.get("/:id", async (req, res) => {
+route_productos.get("/:id", async (req, res) => {
 	const productId = req.params.id;
 	const product = await productsContainer.getById(productId);
 	console.log("product:", product);
@@ -28,7 +28,7 @@ productsRouter.get("/:id", async (req, res) => {
 	}
 });
 
-productsRouter.post("/", async (req, res) => {
+route_productos.post("/", async (req, res) => {
 	if (administrador) {
 		res.json(await productsContainer.save(req.body));
 	} else {
@@ -36,7 +36,7 @@ productsRouter.post("/", async (req, res) => {
 	}
 });
 
-productsRouter.put("/:id", (req, res) => {
+route_productos.put("/:id", (req, res) => {
 	const productId = req.params.id;
 	if (administrador) {
 		productsContainer.updateById(productId, {
@@ -48,14 +48,14 @@ productsRouter.put("/:id", (req, res) => {
 	}
 });
 
-productsRouter.delete("/:id", async (req, res) => {
+route_productos.delete("/:id", async (req, res) => {
 	const productId = req.params.id;
 	administrador
 		? res.send(await productsContainer.deleteById(productId))
 		: res.send(authError);
 });
 
-productsRouter.delete("/", async (req, res) => {
+route_productos.delete("/", async (req, res) => {
 	if (administrador) {
 		res.send(await productsContainer.deleteAll());
 	} else {

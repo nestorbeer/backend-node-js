@@ -1,10 +1,10 @@
 import "dotenv/config"
-const express = require('express');
-const cors = require('cors')
+import express from "express"
+import cors from "cors"
 const PORT = 8080
 const app = express()
-const route_productos = require('./routes/productsRouter')
-const route_carritos = require('./routes/cartRouter')
+import {route_productos} from "./routes/productos.js"
+import {route_carritos} from "./routes/carritos.js"
 
 app.use(cors())
 app.use(express.json());
@@ -26,7 +26,7 @@ app.use((req, res) => {
     }
     res.send(pathError)
 });
-app.use('/', express.static(__dirname + '/public'))
+app.use(express.static("public"));
 app.listen(PORT,()=>{
     console.log('server on')
 })
