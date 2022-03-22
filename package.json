@@ -17,7 +17,11 @@
   },
   "homepage": "https://github.com/nestorbeer/backend-node-js#readme",
   "dependencies": {
+    "dotenv": "^16.0.0",
     "express": "^4.17.2",
+    "firebase-admin": "^10.0.2",
+    "mongodb": "^4.4.1",
+    "mongoose": "^6.2.7",
     "pug": "^3.0.2"
   }
 }

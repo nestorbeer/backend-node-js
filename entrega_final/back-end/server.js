@@ -1,9 +1,10 @@
+import "dotenv/config"
 const express = require('express');
 const cors = require('cors')
 const PORT = 8080
 const app = express()
-const route_productos = require('./routes/productos')
-const route_carritos = require('./routes/carritos')
+const route_productos = require('./routes/productsRouter')
+const route_carritos = require('./routes/cartRouter')
 
 app.use(cors())
 app.use(express.json());

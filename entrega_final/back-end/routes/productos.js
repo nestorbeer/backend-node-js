@@ -1,51 +1,64 @@
-const express = require('express');
-const productos = express.Router()
+import { Router } from "express";
+import productsDao from "../daos/products/products.daos.js";
 
-const Products = require('../containers/ProductsContainer')
-const Prods = new Products('./public/productos.json')
+export const productsRouter = Router();
 
-productos.get('/', async (request, response) => {
-    if(!request.administrador){
-        response.status(404);
-        response.json({error: -1, descripcion: `Ruta ${request.baseUrl} método ${request.method} no autorizada`});
-    } else {
-        response.json(await Prods.getAll())
-    }
-})
-productos.get('/:id', async (request, response) => {
-    const id = parseInt(request.params.id)
-    response.json(await Prods.getById(id))
-})
+const productsContainer = productsDao;
 
-productos.post('/', async (request, response) => {
-    if(!request.administrador){
-        response.status(404);
-        response.json({error: -1, descripcion: `Ruta ${request.baseUrl} método ${request.method} no autorizada`});
-    } else {
-        const prod = request.body
-        response.json(await Prods.save(prod))
-    }
-})
+let administrador = true;
 
-productos.put('/:id', async (request, response) => {
-    if(!request.administrador){
-        response.status(404);
-        response.json({error: -1, descripcion: `Ruta ${request.baseUrl} método ${request.method} no autorizada`});
-    } else {
-        const id = parseInt(request.params.id)
-        const prod = request.body
-        response.json(await Prods.update(id, prod))
-    }
-})
+const authError = (req) => ({
+	error: -1,
+	description: `Ruta ${req.baseUrl} método ${req.method} no autorizada`,
+});
 
-productos.delete('/:id', async (request, response) => {
-    if(!request.administrador){
-        response.status(404);
-        response.json({error: -1, descripcion: `Ruta ${request.baseUrl} método ${request.method} no autorizada`});
-    } else {
-        const id = parseInt(request.params.id)
-        response.json(await Prods.deleteById(id))
-    }
-})
+// Endpoints products
+productsRouter.get("/", async (req, res) => {
+	res.json(await productsContainer.getAll());
+});
 
-module.exports = productos
+productsRouter.get("/:id", async (req, res) => {
+	const productId = req.params.id;
+	const product = await productsContainer.getById(productId);
+	console.log("product:", product);
+	if (product) {
+		res.json(product);
+	} else {
+		res.json({ error: "producto no encontrado" });
+	}
+});
+
+productsRouter.post("/", async (req, res) => {
+	if (administrador) {
+		res.json(await productsContainer.save(req.body));
+	} else {
+		res.send(authError(req));
+	}
+});
+
+productsRouter.put("/:id", (req, res) => {
+	const productId = req.params.id;
+	if (administrador) {
+		productsContainer.updateById(productId, {
+			...req.body,
+		});
+		res.send(productsContainer.getById(productId));
+	} else {
+		res.send(authError(req));
+	}
+});
+
+productsRouter.delete("/:id", async (req, res) => {
+	const productId = req.params.id;
+	administrador
+		? res.send(await productsContainer.deleteById(productId))
+		: res.send(authError);
+});
+
+productsRouter.delete("/", async (req, res) => {
+	if (administrador) {
+		res.send(await productsContainer.deleteAll());
+	} else {
+		res.send(authError(req));
+	}
+});
